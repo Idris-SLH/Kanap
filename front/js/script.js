@@ -11,8 +11,8 @@ fetch("http://localhost:3000/api/products")
         for (let i = 0; i < value.length; i++) {
             // CREATION LIEN
             const $productLink = document.createElement("a");
-            // CREATION ARTICLE
             $productLink.setAttribute("href","./product.html?id=" + value[i]._id);
+            // CREATION ARTICLE
             const $productArticle = document.createElement("article");
             // CREATION IMAGE
             const $productImg = document.createElement("img");
