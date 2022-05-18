@@ -1,5 +1,3 @@
-let totalPrice = 0;
-
 fetch("http://localhost:3000/api/products")
   .then(function(res) {
     if (res.ok) {
@@ -16,6 +14,8 @@ fetch("http://localhost:3000/api/products")
   .catch(function(err) {
     // Une erreur est survenue
   });
+
+let totalPrice = 0;
 
 function findProductById(productList, productId) {
   const productObject = productList.find(element => element._id == productId);
@@ -74,7 +74,9 @@ function productInfoCart(productList, productObject, productCart, index){
   $deleteItem.setAttribute("class", "deleteItem");
   $deleteItem.innerHTML = "Supprimer";
 
-
+  // TOTAL QUANTITÉ
+  const $totalQuantity = document.getElementById("totalQuantity");
+  $totalQuantity.innerHTML = localStorage.length;
 
   // TOTAL PRIX
   const $totalPrice = document.getElementById("totalPrice");
@@ -98,10 +100,7 @@ function productInfoCart(productList, productObject, productCart, index){
   $productDiv4.appendChild($productDiv6) 
   $productDiv6.appendChild($deleteItem) 
 
-
-  const input = $productInput;
-  input.addEventListener('change', function () {
-
+  $productInput.addEventListener('change', function () {
     totalPrice -= productObject.price*productCart[2];
     productCart[2] = parseInt(this.value);
     totalPrice += productObject.price*productCart[2];
@@ -122,25 +121,85 @@ function productInfoCart(productList, productObject, productCart, index){
       index++; 
     }
     totalPrice -= productObject.price*productCart[2];
-    $totalQuantity.innerHTML = localStorage.length;
     $totalPrice.innerHTML = totalPrice;
     $section.removeChild($productArticle);
     localStorage.removeItem("cart"+[index]);
+    $totalQuantity.innerHTML = localStorage.length;
   });
 }
 
-  // TOTAL QUANTITÉ
-  const $totalQuantity = document.getElementById("totalQuantity");
-  $totalQuantity.innerHTML = localStorage.length;
+// CONTACT
+const contactObject = {
+  firstName : firstName.value,
+  lastName : lastName.value,
+  address : address.value,
+  city : city.value,
+  email : email.value
+}
 
-// MESSAGE ERREUR
-const $firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
-const $lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
-const $addressErrorMsg = document.getElementById("addressErrorMsg");
-const $cityErrorMsg = document.getElementById("cityErrorMsg");
-const $emailErrorMsg = document.getElementById("emailErrorMsg");
-$firstNameErrorMsg.innerHTML = "Ceci est un message d'erreur";
-$lastNameErrorMsg.innerHTML = "Ceci est un message d'erreur";
-$addressErrorMsg.innerHTML = "Ceci est un message d'erreur";
-$cityErrorMsg.innerHTML = "Ceci est un message d'erreur";
-$emailErrorMsg.innerHTML = "Ceci est un message d'erreur";
+const productIdTable = []
+
+document.addEventListener('change', function(e) {
+  if (!e.target.matches('#firstName, #lastName, #address, #city')) return;
+  var target = e.target;
+  if (isValid(target)) {
+    e.target.nextElementSibling.innerHTML = "";
+  } else {
+    e.target.nextElementSibling.innerHTML = "Ceci est un message d'erreur";
+  }});
+
+
+function isValid(input) {
+  if (input.id == "address") {
+    return /^[A-é'èà, 0-9]+$/.test(input.value);
+  }
+  return /^[A-é- ]+$/.test(input.value);
+}  
+
+
+
+// SUBMIT
+document
+  .querySelector(".cart__order__form")
+  .addEventListener("submit", function(e) {
+    e.preventDefault();
+    if (isValidAll()) {
+      contactObject.firstName = firstName.value;
+      contactObject.lastName = lastName.value;
+      contactObject.address = address.value;
+      contactObject.city = city.value;
+      contactObject.email = email.value;
+      for (let i = 0; i < localStorage.length; i++) {
+        productIdTable.push(JSON.parse(localStorage.getItem("cart"+[i]))[0])
+      }
+      send(); 
+    }
+  });
+
+function isValidAll() {
+  if (isValid(firstName) && isValid(lastName) && isValid(city) && isValid(address)) {
+    return true;
+  }
+  else {    
+    return false;
+  }
+}
+
+function send() {
+  fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json', 
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({"contact": contactObject, "products": productIdTable})
+  })
+  .then(function(res) {
+    if (res.ok) {
+      return res.json();
+    }
+  })
+  .then(function(response) {
+    document.location.href="./confirmation.html?orderId=" + response.orderId; 
+  });
+}
