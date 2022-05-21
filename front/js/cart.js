@@ -106,9 +106,9 @@ function productInfoCart(productList, productObject, productCart, index){
   // MODIFICATION DE LA QUANTITÉ DU PRODUIT
   $productInput.addEventListener('change', function () {
     totalPrice -= productObject.price*productCart[2]; // Soustraction du prix total d'origine
-    productCart[2] = parseInt(this.value); // Initialisation du nouveau prix, par la valeur tappée
-    totalPrice += productObject.price*productCart[2]; // Addition du prix total
-    localStorage.setItem("cart"+[index], JSON.stringify(productCart)); // Ajout du nouveau prix
+    productCart[2] = parseInt(this.value); // Remplacement de la quantité du produit dans le panier
+    totalPrice += productObject.price*productCart[2]; // Addition du nouveau prix total
+    localStorage.setItem("cart"+[index], JSON.stringify(productCart)); // Remplacement du panier dans le localStorage
     $productPrice.innerHTML = "(" + productObject.price + " € unité) " + productObject.price*productCart[2] + " €"; // Affichage du nouveau prix
     $totalPrice.innerHTML = totalPrice;
   });
@@ -116,20 +116,20 @@ function productInfoCart(productList, productObject, productCart, index){
   // SUPPRESSION DU PRODUIT DANS LE PANIER
   $deleteItem.addEventListener('click', function () {
     while (index != (localStorage.length-1)) { // Boucle jusqu'au dernier produit du panier
-      siblingCart = JSON.parse(localStorage.getItem("cart"+[index+1])); // Recuperation du produit suivant
+      siblingCart = JSON.parse(localStorage.getItem("cart"+[index+1])); // Recuperation du produit suivant dans le localStorage
       localStorage.setItem(("cart"+[index]), JSON.stringify(siblingCart)); // Remplacement du produit supprimer par le suivant dans le localStorage
-      let siblingId = this.closest("article").nextSibling.dataset.id; // Récuperation de l'id du produit suivant
+      let siblingId = this.closest("article").nextSibling.dataset.id; // Récuperation du data-id de l'article du produit suivant
       var siblingObject = findProductById(productList, siblingId); // Récuperation des informations du produit dans le back grace à l'id
       totalPrice -= siblingObject.price*siblingCart[2]; // Soustraction du prix du produit dans le total 
-      productInfoCart(productList, siblingObject, siblingCart, index); // Re-création du produit suivant avec le nouvel id 
       $section.removeChild(this.closest("article").nextSibling); // Suppression du produit suivant d'origine
+      productInfoCart(productList, siblingObject, siblingCart, index); // Re-création de l'article suivant avec le nouvel id 
       index++; 
     }
     totalPrice -= productObject.price*productCart[2]; // Soustraction du prix du produit dans le total 
-    $totalPrice.innerHTML = totalPrice; // Affichage du nouveau prix total
+    $totalPrice.innerHTML = totalPrice; // Actualisation du nouveau prix total
     $section.removeChild($productArticle); // Suppression de l'article sélectionné
-    localStorage.removeItem("cart"+[index]); // Supression du produit dans le localStorage
-    $totalQuantity.innerHTML = localStorage.length; // Affichage du nombre de produit dans le panier
+    localStorage.removeItem("cart"+[index]); // Supression du produit superflu dans le localStorage
+    $totalQuantity.innerHTML = localStorage.length; // Actualisation du nombre de produit dans le panier
   });
 }
 
