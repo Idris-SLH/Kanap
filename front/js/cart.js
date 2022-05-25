@@ -150,7 +150,7 @@ document.addEventListener('change', function(e) {
   if (isValid(target)) { // Rien n'afficher si input valide
     e.target.nextElementSibling.innerHTML = "";
   } else { // Message d'erreur affiché dans la balise suivante (ex: lastNameErrorMsg)
-    e.target.nextElementSibling.innerHTML = "Ceci est un message d'erreur";
+    e.target.nextElementSibling.innerHTML = "Erreur, caractères non autorisés";
   }});
 
 // VÉRIFICATION DE LA VALIDITÉ DU CHAMP SÉLECTIONNÉ
