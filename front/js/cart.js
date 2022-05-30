@@ -199,16 +199,21 @@ document
     e.preventDefault();
     if (isValidAll()) { // Si les champs sont valides
       // Initialisé les informations dans l'objet contact
-      contactObject.firstName = firstName.value;
-      contactObject.lastName = lastName.value;
-      contactObject.address = address.value;
-      contactObject.city = city.value;
-      contactObject.email = email.value;
-      // Initialisé l'id produit de chaque article dans le tableau
-      for (let i = 0; i < localStorage.length; i++) {
-        productIdTable.push(JSON.parse(localStorage.getItem("cart"+[i]))[0])
+      if (localStorage.length < 1) {
+        alert('Aucun produit dans le panier'); // A condition qu'il y a au moins 1 objet dans le panier
       }
-      // Envoie la requete POST
-      send(); 
+      else {
+        contactObject.firstName = firstName.value;
+        contactObject.lastName = lastName.value;
+        contactObject.address = address.value;
+        contactObject.city = city.value;
+        contactObject.email = email.value;
+        // Initialisé l'id produit de chaque article dans le tableau
+        for (let i = 0; i < localStorage.length; i++) {
+          productIdTable.push(JSON.parse(localStorage.getItem("cart"+[i]))[0])
+        }
+        // Envoie la requete POST
+        send(); 
+      }
     }
   });
